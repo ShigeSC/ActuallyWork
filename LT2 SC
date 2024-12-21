@@ -19,7 +19,7 @@ w1:Button(
 ) 
 
 w1:Button(
-    "Kron Hub",
+    "Kron Hub V2",
     function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/DevKron/Kron_Hub/refs/heads/main/lt2new'))("")
     end
@@ -27,38 +27,38 @@ w1:Button(
 
 
 w1:Button(
-    "Dazed X",
+    "Kron Hub Old",
     function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/666TranZit666/rewrite/main/Dazed%20X'))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/DevKron/Kron_Hub/refs/heads/main/lt2'))("")
     end
 ) 
 
 w1:Button(
-    "Interject (PC)",
+    "Lua Ware (PC)",
     function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/666TranZit666/Interject/main/Interject.lua"))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/frencaliber/LuaWareLoader.lw/main/luawareloader.wtf',true))()
     end
 )
 
 w1:Button(
-    "SchoolHub Pc / Emulators",
+    "Lua Ware (Mobile)",
     function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/IHateSchoolIsCool/FuckCheapShops/main/SchoolHubV3'))('Fuck Cheap Shops')
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/frencaliber/LuaWareLoader.lw/main/luawareloader.wtf',true))()
 
     end
 ) 
 
 w1:Button(
-    "Skidware",
+    "Dark X",
     function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/frencaliber/LuaWareLoader.lw/main/luawareloader.wtf",true))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/stepforintructions/Ui/refs/heads/main/czxc'))("")
     end
 )
 
 w1:Button(
-    "Step Script",
+    "Roblox Islands Script",
     function()
-        loadstring(Game:HttpGet("https://bit.ly/StepScripts"))("StepLT2")
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/pascaldercoole1/Open-Source-Scripts/main/FreeIslands'))()
     end
 )
 
