@@ -19,18 +19,12 @@ w1:Button(
 ) 
 
 w1:Button(
-    "Dark X",
-    function()
-        loadstring(game:HttpGet"https://raw.githubusercontent.com/darkxwin/darkxsourcethinkyoutousedarkx/main/darkx")()
-    end
-) 
-
-w1:Button(
-    "Kron Hub V2",
+    "Kron Hub",
     function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/DevKron/Kron_Hub/refs/heads/main/lt2new'))("")
     end
 ) 
+
 
 w1:Button(
     "Dazed X",
