@@ -1,6 +1,6 @@
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
 
-local w1 = library:Window("LT2Hub") -- Text
+local w1 = library:Window("LT2SC") -- Text
 
 w1:Button(
     "ButterHub (PC)",
@@ -78,5 +78,3 @@ w1:Button(
         end
     end
 )
-
-w1:Label("IHATESCHOOL") -- Text
