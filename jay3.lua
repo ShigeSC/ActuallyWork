@@ -22,6 +22,65 @@ task.spawn(function()
     end
 end)
 
+-- ==================== ANTI AFK (Improved & Built-in) ====================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = Players.LocalPlayer
+
+print("✅ [Anti-AFK] Script started")
+
+local function disableIdleConnections()
+    local count = 0
+    pcall(function()
+        for _, connection in ipairs(getconnections(player.Idled)) do
+            connection:Disable()
+            count += 1
+        end
+    end)
+    if count > 0 then
+        print("✅ [Anti-AFK] Disabled " .. count .. " idle connections")
+    end
+end
+
+-- Disable immediately
+disableIdleConnections()
+
+-- Keep disabling every 25 seconds (in case game reconnects it)
+RunService.Heartbeat:Connect(function()
+    if tick() % 25 < 1 then
+        disableIdleConnections()
+    end
+end)
+
+-- Input simulation loop (every 40 seconds)
+task.spawn(function()
+    while true do
+        pcall(function()
+            -- Press Space
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+            task.wait(0.12)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+
+            -- Small movement + jump
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") then
+                local hum = char.Humanoid
+                hum:Move(Vector3.new(0, 0, 0.1))
+                hum.Jump = true
+                task.wait(0.4)
+                hum.Jump = false
+            end
+        end)
+
+        print("✅ [Anti-AFK] Sent input (Space + Jump)")
+        task.wait(40)
+    end
+end)
+
+print("✅ [Anti-AFK] Fully loaded and protecting you")
+-- =======================================================================
+
 -- ==================== CONFIG SYSTEM ====================
 local CONFIG_FOLDER = "BOOSCRIPT"
 local HttpService = game:GetService("HttpService")
@@ -500,4 +559,4 @@ task.spawn(function()
     end
 end)
 
-print("SHOP by @boo10001 - Height reduced to remove empty space")
+print("SHOP by @boo10001 loaded - Anti-AFK is already running automatically")
