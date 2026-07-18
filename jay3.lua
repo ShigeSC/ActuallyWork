@@ -234,7 +234,7 @@ seedDropdown = SeedsSector:AddDropdown("Select Seed", {
     "Acorn", "Apple", "Bamboo", "Banana", "Blueberry", "Cactus", "Carrot", "Cherry",
     "Coconut", "Corn", "Dragon Fruit", "Dragon's Breath", "Fire Fern", "Grape",
     "Green Bean", "Hypno Bloom", "Mango", "Moon Bloom", "Mushroom", "Padding",
-    "Pineapple", "Poison Apple", "Pomegranate", "Pudding", "RocketPop", "StarFruit",
+    "Pineapple", "Poison Apple", "Pomegranate", "Pudding", "Rocket Pop", "Star Fruit",
     "Strawberry", "Sun Bloom", "Sunflower", "Tomato", "Tulip", "Venom Spitter",
     "Venus Fly Trap"
 }, "", true, function(Value)
@@ -527,7 +527,7 @@ task.spawn(function()
                 "Acorn", "Apple", "Bamboo", "Banana", "Blueberry", "Cactus", "Carrot", "Cherry",
                 "Coconut", "Corn", "Dragon Fruit", "Dragon's Breath", "Fire Fern", "Grape",
                 "Green Bean", "Hypno Bloom", "Mango", "Moon Bloom", "Mushroom", "Padding",
-                "Pineapple", "Poison Apple", "Pomegranate", "Pudding", "RocketPop", "StarFruit",
+                "Pineapple", "Poison Apple", "Pomegranate", "Pudding", "Rocket Pop", "Star Fruit",
                 "Strawberry", "Sun Bloom", "Sunflower", "Tomato", "Tulip", "Venom Spitter",
                 "Venus Fly Trap"
             }
@@ -595,4 +595,4 @@ task.spawn(function()
     end
 end)
 
-print("SHOP by @boo10001 loaded - Full seed list added + Anti-AFK running")
+print("SHOP by @boo10001 loaded - All seed names fixed with proper spacing")
