@@ -10,7 +10,6 @@ library.theme.topheight = 36
 game:GetService("UserInputService").OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
 game:GetService("UserInputService").MouseIconEnabled = true
 
--- Much smaller height to remove empty space
 local Window = library:CreateWindow("SHOP by @boo10001", Vector2.new(380, 320), Enum.KeyCode.RightShift)
 
 -- Force mouse
@@ -22,10 +21,11 @@ task.spawn(function()
     end
 end)
 
--- ==================== ANTI AFK (Improved & Built-in) ====================
+-- ==================== ANTI AFK ====================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local SoundService = game:GetService("SoundService")
 local player = Players.LocalPlayer
 
 print("✅ [Anti-AFK] Script started")
@@ -43,26 +43,21 @@ local function disableIdleConnections()
     end
 end
 
--- Disable immediately
 disableIdleConnections()
 
--- Keep disabling every 25 seconds (in case game reconnects it)
 RunService.Heartbeat:Connect(function()
     if tick() % 25 < 1 then
         disableIdleConnections()
     end
 end)
 
--- Input simulation loop (every 40 seconds)
 task.spawn(function()
     while true do
         pcall(function()
-            -- Press Space
             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
             task.wait(0.12)
             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
 
-            -- Small movement + jump
             local char = player.Character
             if char and char:FindFirstChild("Humanoid") then
                 local hum = char.Humanoid
@@ -72,7 +67,6 @@ task.spawn(function()
                 hum.Jump = false
             end
         end)
-
         print("✅ [Anti-AFK] Sent input (Space + Jump)")
         task.wait(40)
     end
@@ -237,7 +231,12 @@ local SeedsTab = Window:CreateTab("Seeds")
 local SeedsSector = SeedsTab:CreateSector("Seeds", "left")
 
 seedDropdown = SeedsSector:AddDropdown("Select Seed", {
-    "Carrot", "Strawberry", "Blueberry", "Tulip", "Tomato", "Apple", "Bamboo", "Corn"
+    "Acorn", "Apple", "Bamboo", "Banana", "Blueberry", "Cactus", "Carrot", "Cherry",
+    "Coconut", "Corn", "Dragon Fruit", "Dragon's Breath", "Fire Fern", "Grape",
+    "Green Bean", "Hypno Bloom", "Mango", "Moon Bloom", "Mushroom", "Padding",
+    "Pineapple", "Poison Apple", "Pomegranate", "Pudding", "RocketPop", "StarFruit",
+    "Strawberry", "Sun Bloom", "Sunflower", "Tomato", "Tulip", "Venom Spitter",
+    "Venus Fly Trap"
 }, "", true, function(Value)
     selectedSeeds = type(Value) == "table" and Value or {Value}
 end)
@@ -374,7 +373,7 @@ ControlSector:AddButton("X Destroy", function()
     print("GUI destroyed")
 end)
 
--- ==================== MOVABLE CIRCLE (FIXED) ====================
+-- ==================== MOVABLE CIRCLE ====================
 local restoreCircle = nil
 local dragging = false
 local dragStart, startPos
@@ -419,7 +418,6 @@ local function createRestoreCircle()
     circle.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
-
             if tick() - clickTime < 0.2 then
                 if Window and Window.Frame then
                     Window.Frame.Visible = true
@@ -467,7 +465,6 @@ ControlSector:AddButton("Show", function()
     showGUI()
 end)
 
--- Press N to hide/unhide
 game:GetService("UserInputService").InputBegan:Connect(function(input, gp)
     if gp then return end
     if input.KeyCode == Enum.KeyCode.N then
@@ -478,6 +475,38 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gp)
                 showGUI()
             end
         end
+    end
+end)
+
+-- ==================== STRONG MUTE ====================
+task.spawn(function()
+    while true do
+        local anyAutoBuy = autoBuySelectedSeeds or autoBuyAllSeeds or 
+                           autoBuySelectedGears or autoBuyAllGears or 
+                           autoBuySelectedCrates or autoBuyAllCrates
+
+        if anyAutoBuy then
+            pcall(function()
+                SoundService.Volume = 0
+                for _, s in pairs(SoundService:GetDescendants()) do
+                    if s:IsA("Sound") then
+                        s.Volume = 0
+                        s.Playing = false
+                    end
+                end
+                for _, s in pairs(workspace:GetDescendants()) do
+                    if s:IsA("Sound") then
+                        s.Volume = 0
+                        s.Playing = false
+                    end
+                end
+            end)
+        else
+            pcall(function()
+                SoundService.Volume = 1
+            end)
+        end
+        task.wait(0.1)
     end
 end)
 
@@ -494,7 +523,14 @@ task.spawn(function()
         end
 
         if autoBuyAllSeeds then
-            local allSeeds = {"Carrot", "Strawberry", "Blueberry", "Tulip", "Tomato", "Apple", "Bamboo", "Corn"}
+            local allSeeds = {
+                "Acorn", "Apple", "Bamboo", "Banana", "Blueberry", "Cactus", "Carrot", "Cherry",
+                "Coconut", "Corn", "Dragon Fruit", "Dragon's Breath", "Fire Fern", "Grape",
+                "Green Bean", "Hypno Bloom", "Mango", "Moon Bloom", "Mushroom", "Padding",
+                "Pineapple", "Poison Apple", "Pomegranate", "Pudding", "RocketPop", "StarFruit",
+                "Strawberry", "Sun Bloom", "Sunflower", "Tomato", "Tulip", "Venom Spitter",
+                "Venus Fly Trap"
+            }
             for _, seed in ipairs(allSeeds) do
                 pcall(function()
                     local Networking = require(game.ReplicatedStorage.SharedModules.Networking)
@@ -559,4 +595,4 @@ task.spawn(function()
     end
 end)
 
-print("SHOP by @boo10001 loaded - Anti-AFK is already running automatically")
+print("SHOP by @boo10001 loaded - Full seed list added + Anti-AFK running")
