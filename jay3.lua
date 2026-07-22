@@ -306,6 +306,16 @@ CleanupSector:AddButton("Cleanup + 15 FPS", function()
     print("Cleanup + Smooth + 15 FPS activated")
 end)
 
+-- NEW: 10 FPS Button added here
+CleanupSector:AddButton("Cleanup + 10 FPS", function()
+	cleanupEnabled = true
+    fpsCap = 10
+	applyLowCPU()
+    local setfpscap = setfpscap or function() end
+    setfpscap(10)
+    print("FPS capped at 10")
+end)
+
 CleanupSector:AddButton("FPS Cap 30", function()
     fpsCap = 30
     local setfpscap = setfpscap or function() end
