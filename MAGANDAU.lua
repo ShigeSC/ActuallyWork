@@ -8,14 +8,14 @@ local TextService = game:GetService("TextService")
 
 local Custom = {}
 do
-	Custom.ColorRGB = Color3.fromRGB(220, 40, 40)
+	Custom.ColorRGB = Color3.fromRGB(178, 80, 255)
 	Custom.ObsidianTop = Color3.fromRGB(15, 14, 22)
 	Custom.ObsidianMid = Color3.fromRGB(6, 7, 12)
 	Custom.ObsidianLow = Color3.fromRGB(26, 14, 38)
 	Custom.Surface = Color3.fromRGB(18, 19, 27)
 	Custom.Surface2 = Color3.fromRGB(23, 22, 32)
 	Custom.Surface3 = Color3.fromRGB(31, 27, 42)
-	Custom.Stroke = Color3.fromRGB(150, 30, 30)
+	Custom.Stroke = Color3.fromRGB(112, 63, 176)
 	Custom.Text = Color3.fromRGB(235, 236, 245)
 	Custom.Muted = Color3.fromRGB(156, 154, 170)
 	Custom.Font = Enum.Font.GothamBold
