@@ -291,7 +291,7 @@ local function OpenClose()
 		BackgroundTransparency = 1,
 		Position = UDim2.new(0.1021, 0, 0.0743, 0),
 		Size = UDim2.new(0, 50, 0, 50),
-		Image = "rbxassetid://8620551404",
+		Image = "rbxassetid://90541504618217",
 		Visible = true,
 	}, ScreenGui)
 
