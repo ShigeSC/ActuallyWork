@@ -1,17 +1,47 @@
 --[[
-    Auto Inferno Booth Scanner + Server Hop
+    Inferno Booth Scanner
+    Only runs in Trade World
 ]]
 
--- Prevent multiple instances
-if getgenv().InfernoScannerRunning then
+local TRADE_WORLD_PLACE_ID = 129954712878723
+
+-- Silent exit if not Trade World
+if game.PlaceId ~= TRADE_WORLD_PLACE_ID then
     return
 end
-getgenv().InfernoScannerRunning = true
+
+print("=== Inferno Scanner Starting ===")
+print("Correct Trade World detected")
+print("Waiting 15 seconds for game to fully load...")
+
+task.wait(15)
+
+print("Loading modules...")
+
+local Modules = game.ReplicatedStorage:WaitForChild("Modules", 20)
+if not Modules then
+    warn("Modules not found")
+    return
+end
+
+local TradeBoothControllers = Modules:WaitForChild("TradeBoothControllers", 10)
+if not TradeBoothControllers then
+    warn("TradeBoothControllers not found")
+    return
+end
+
+local ListingController = require(TradeBoothControllers:WaitForChild("TradeBoothListingController"))
+local PetMutationRegistry = require(game.ReplicatedStorage:WaitForChild("Data"):WaitForChild("PetRegistry"):WaitForChild("PetMutationRegistry"))
+local EnumToName = PetMutationRegistry.EnumToPetMutation or {}
+
+print("Modules loaded successfully")
 
 local CONFIG = {
-    WEBHOOK_URL = "https://discord.com/api/webhooks/1530248772091908206/01aXIqyblwZOAo-goz0oRkL95Ip_9LJhOi15Xg1J1Nn_85k7I-7ozg4PhWM_CoksxNRF",
+    WEBHOOK_URL = "https://discord.com/api/webhooks/1530267036423295046/3vRLs5xaF2TX9QE28nzFYAY3uZgC_28Z3dcmxFdtUJEKfwvneAieghk5jIWp_c2VI0R0",
     HOP_DELAY = 8,
-    MIN_PLAYERS = 10,
+    MIN_PLAYERS = 15,
+    MAX_PLAYERS = 25,
+    VISITED_FILE = "visited_servers.txt",
 }
 
 local HttpService = game:GetService("HttpService")
@@ -19,17 +49,37 @@ local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Wait for game to load
-repeat task.wait() until game:IsLoaded()
-task.wait(2)
-
-local Controllers = game.ReplicatedStorage:WaitForChild("Modules"):WaitForChild("TradeBoothControllers")
-local ListingController = require(Controllers:WaitForChild("TradeBoothListingController"))
-local PetMutationRegistry = require(game.ReplicatedStorage.Data.PetRegistry.PetMutationRegistry)
-local EnumToName = PetMutationRegistry.EnumToPetMutation or {}
-
 local PlaceId = game.PlaceId
 local JobId = game.JobId
+
+-- Visited servers
+local function loadVisited()
+    local visited = {}
+    local success, content = pcall(function()
+        return readfile(CONFIG.VISITED_FILE)
+    end)
+    if success and content then
+        for id in string.gmatch(content, "[^\n]+") do
+            visited[id] = true
+        end
+    end
+    return visited
+end
+
+local function saveVisited(visited)
+    local lines = {}
+    for id in pairs(visited) do
+        table.insert(lines, id)
+    end
+    pcall(function()
+        writefile(CONFIG.VISITED_FILE, table.concat(lines, "\n"))
+    end)
+end
+
+local visitedServers = loadVisited()
+visitedServers[JobId] = true
+saveVisited(visitedServers)
+print("Current server marked as visited")
 
 local function getMutationName(code)
     if not code or code == "" then return "None" end
@@ -55,11 +105,21 @@ end
 local function scanBooths()
     local results = {}
     local TradeWorld = workspace:FindFirstChild("TradeWorld")
-    if not TradeWorld then return results end
-    local BoothsFolder = TradeWorld:FindFirstChild("Booths")
-    if not BoothsFolder then return results end
+    if not TradeWorld then
+        print("TradeWorld not found")
+        return results
+    end
 
-    for _, booth in ipairs(BoothsFolder:GetChildren()) do
+    local BoothsFolder = TradeWorld:FindFirstChild("Booths")
+    if not BoothsFolder then
+        print("Booths not found")
+        return results
+    end
+
+    local booths = BoothsFolder:GetChildren()
+    print("Scanning", #booths, "booths...")
+
+    for _, booth in ipairs(booths) do
         local uuid = booth.Name
 
         pcall(function()
@@ -103,6 +163,7 @@ local function scanBooths()
                     owner = owner,
                     pets = pets
                 })
+                print("Found", #pets, "Inferno pet(s) from", owner)
             end
         end
     end
@@ -110,9 +171,11 @@ local function scanBooths()
     return results
 end
 
-local function buildDescription(results)
-    local desc = ""
+local function sendWebhook(results)
+    local requestFunc = request or http_request or (syn and syn.request)
+    if not requestFunc then return end
 
+    local desc = ""
     if #results == 0 then
         desc = "*No Inferno pets found*\n"
     else
@@ -136,27 +199,12 @@ local function buildDescription(results)
     desc = desc .. string.format("🌐 Players: %d/%d\n", #Players:GetPlayers(), Players.MaxPlayers)
     desc = desc .. "🔗 Join: " .. getJoinLink()
 
-    return desc
-end
-
-local function sendWebhook(results)
-    local requestFunc = request or http_request or (syn and syn.request)
-    if not requestFunc then
-        warn("No request function")
-        return
-    end
-
     local embed = {
         title = "🔥 Inferno Pets Found",
-        description = buildDescription(results),
+        description = desc,
         color = 16729088,
         timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ"),
         footer = { text = "Auto Scanner • Trade World" }
-    }
-
-    local payload = {
-        username = "Inferno Scanner",
-        embeds = {embed}
     }
 
     pcall(function()
@@ -164,62 +212,80 @@ local function sendWebhook(results)
             Url = CONFIG.WEBHOOK_URL,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
-            Body = HttpService:JSONEncode(payload)
+            Body = HttpService:JSONEncode({
+                username = "Inferno Scanner",
+                embeds = {embed}
+            })
         })
     end)
 
-    print("✅ Webhook sent | Booths with Inferno:", #results)
+    print("✅ Webhook sent | Inferno booths:", #results)
 end
 
 local function serverHop()
     local requestFunc = request or http_request or (syn and syn.request)
     if not requestFunc then return end
 
-    local response = requestFunc({
-        Url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100",
-        Method = "GET"
-    })
+    local tried = {}
+    local maxAttempts = 30
+    local originalJobId = game.JobId
 
-    if not response or not response.Body then
-        warn("Failed to get servers")
-        return
-    end
+    for attempt = 1, maxAttempts do
+        print("Looking for server... (" .. attempt .. "/" .. maxAttempts .. ")")
 
-    local success, data = pcall(function()
-        return HttpService:JSONDecode(response.Body)
-    end)
+        local response = requestFunc({
+            Url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100",
+            Method = "GET"
+        })
 
-    if not success or not data or not data.data then return end
+        if response and response.Body then
+            local ok, data = pcall(function()
+                return HttpService:JSONDecode(response.Body)
+            end)
 
-    for _, server in ipairs(data.data) do
-        if server.playing >= CONFIG.MIN_PLAYERS and server.playing < server.maxPlayers and server.id ~= JobId then
-            print("Hopping →", server.id, "| Players:", server.playing)
-            TeleportService:TeleportToPlaceInstance(PlaceId, server.id, LocalPlayer)
-            return
+            if ok and data and data.data then
+                for _, server in ipairs(data.data) do
+                    if server.playing >= CONFIG.MIN_PLAYERS
+                    and server.playing <= CONFIG.MAX_PLAYERS
+                    and server.id ~= originalJobId
+                    and not tried[server.id]
+                    and not visitedServers[server.id] then
+
+                        tried[server.id] = true
+                        print("Trying →", server.id, "| Players:", server.playing)
+
+                        pcall(function()
+                            TeleportService:TeleportToPlaceInstance(PlaceId, server.id, LocalPlayer)
+                        end)
+
+                        for i = 1, 6 do
+                            task.wait(1)
+                            if game.JobId ~= originalJobId then
+                                print("Teleport successful!")
+                                return
+                            end
+                        end
+
+                        print("Teleport failed, trying next...")
+                    end
+                end
+            end
         end
+
+        task.wait(1.5)
     end
 
-    warn("No good server found")
+    print("No good server found → forcing place rejoin")
+    pcall(function()
+        TeleportService:Teleport(PlaceId)
+    end)
 end
 
--- Queue script for next server
-local thisScript = debug.getinfo(1, "S").source
-if queue_on_teleport then
-    -- Re-queue the whole logic
-    queue_on_teleport([[
-        getgenv().InfernoScannerRunning = false
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ShigeSC/ActuallyWork/refs/heads/main/AJOIN.lua"))()
-    ]])
-end
-
--- ========== MAIN ==========
-print("=== Auto Inferno Scanner Started ===")
-
+-- Main
 print("Scanning booths...")
 local results = scanBooths()
 sendWebhook(results)
 
 print("Waiting", CONFIG.HOP_DELAY, "s before hop...")
 task.wait(CONFIG.HOP_DELAY)
-
 serverHop()
