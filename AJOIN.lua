@@ -208,7 +208,7 @@ if queue_on_teleport then
     -- Re-queue the whole logic
     queue_on_teleport([[
         getgenv().InfernoScannerRunning = false
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/yourname/yourrepo/main/inferno.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ShigeSC/ActuallyWork/refs/heads/main/AJOIN.lua"))()
     ]])
 end
 
