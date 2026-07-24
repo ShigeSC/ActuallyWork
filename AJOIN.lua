@@ -1,11 +1,12 @@
 --[[
     Inferno Booth Scanner
-    Only runs in Trade World
+    - Only Inferno mutation
+    - Only 400–800 Tokens
+    - Never reuses JobId
 ]]
 
 local TRADE_WORLD_PLACE_ID = 129954712878723
 
--- Silent exit if not Trade World
 if game.PlaceId ~= TRADE_WORLD_PLACE_ID then
     return
 end
@@ -41,6 +42,8 @@ local CONFIG = {
     HOP_DELAY = 8,
     MIN_PLAYERS = 15,
     MAX_PLAYERS = 25,
+    MIN_PRICE = 400,   -- minimum tokens
+    MAX_PRICE = 800,   -- maximum tokens
     VISITED_FILE = "visited_servers.txt",
 }
 
@@ -52,15 +55,17 @@ local LocalPlayer = Players.LocalPlayer
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
--- Visited servers
+-- ========== Visited JobIds ==========
 local function loadVisited()
     local visited = {}
     local success, content = pcall(function()
         return readfile(CONFIG.VISITED_FILE)
     end)
-    if success and content then
-        for id in string.gmatch(content, "[^\n]+") do
-            visited[id] = true
+    if success and content and content ~= "" then
+        for id in string.gmatch(content, "[^\r\n]+") do
+            if id and id ~= "" then
+                visited[id] = true
+            end
         end
     end
     return visited
@@ -79,8 +84,9 @@ end
 local visitedServers = loadVisited()
 visitedServers[JobId] = true
 saveVisited(visitedServers)
-print("Current server marked as visited")
+print("Marked current JobId as visited:", JobId)
 
+-- ========== Helpers ==========
 local function getMutationName(code)
     if not code or code == "" then return "None" end
     return EnumToName[tostring(code)] or tostring(code)
@@ -102,19 +108,13 @@ local function getJoinLink()
     )
 end
 
+-- ========== Scan (Inferno + 400-800 Tokens only) ==========
 local function scanBooths()
     local results = {}
     local TradeWorld = workspace:FindFirstChild("TradeWorld")
-    if not TradeWorld then
-        print("TradeWorld not found")
-        return results
-    end
-
+    if not TradeWorld then return results end
     local BoothsFolder = TradeWorld:FindFirstChild("Booths")
-    if not BoothsFolder then
-        print("Booths not found")
-        return results
-    end
+    if not BoothsFolder then return results end
 
     local booths = BoothsFolder:GetChildren()
     print("Scanning", #booths, "booths...")
@@ -146,14 +146,16 @@ local function scanBooths()
                 local data = listing.data or {}
                 local petData = data.PetData or {}
                 local mutation = getMutationName(petData.MutationType)
+                local price = tonumber(listing.listingPrice) or 0
 
-                if mutation == "Inferno" then
+                -- Only Inferno + price between 400 and 800
+                if mutation == "Inferno" and price >= CONFIG.MIN_PRICE and price <= CONFIG.MAX_PRICE then
                     table.insert(pets, {
                         type = safe(data.PetType),
                         name = safe(petData.Name),
                         weight = getCurrentWeight(petData.BaseWeight, petData.Level),
                         level = safe(petData.Level),
-                        price = safe(listing.listingPrice)
+                        price = price
                     })
                 end
             end
@@ -163,7 +165,7 @@ local function scanBooths()
                     owner = owner,
                     pets = pets
                 })
-                print("Found", #pets, "Inferno pet(s) from", owner)
+                print("Found", #pets, "Inferno pet(s) (400-800 Tokens) from", owner)
             end
         end
     end
@@ -171,19 +173,20 @@ local function scanBooths()
     return results
 end
 
+-- ========== Webhook ==========
 local function sendWebhook(results)
     local requestFunc = request or http_request or (syn and syn.request)
     if not requestFunc then return end
 
     local desc = ""
     if #results == 0 then
-        desc = "*No Inferno pets found*\n"
+        desc = "*No Inferno pets (400-800 Tokens) found*\n"
     else
         for _, booth in ipairs(results) do
             desc = desc .. "**" .. booth.owner .. "**\n"
             for _, pet in ipairs(booth.pets) do
                 desc = desc .. string.format(
-                    "• **%s** (%s) | %s | Lv.%s | %s Tokens\n",
+                    "• **%s** (%s) | %s | Lv.%s | **%s Tokens**\n",
                     pet.type, pet.name, pet.weight, pet.level, pet.price
                 )
             end
@@ -200,7 +203,7 @@ local function sendWebhook(results)
     desc = desc .. "🔗 Join: " .. getJoinLink()
 
     local embed = {
-        title = "🔥 Inferno Pets Found",
+        title = "🔥 Inferno Pets (400-800 Tokens)",
         description = desc,
         color = 16729088,
         timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ"),
@@ -219,19 +222,20 @@ local function sendWebhook(results)
         })
     end)
 
-    print("✅ Webhook sent | Inferno booths:", #results)
+    print("✅ Webhook sent | Matching booths:", #results)
 end
 
+-- ========== Server Hop ==========
 local function serverHop()
     local requestFunc = request or http_request or (syn and syn.request)
     if not requestFunc then return end
 
-    local tried = {}
-    local maxAttempts = 30
+    local triedThisSession = {}
+    local maxAttempts = 40
     local originalJobId = game.JobId
 
     for attempt = 1, maxAttempts do
-        print("Looking for server... (" .. attempt .. "/" .. maxAttempts .. ")")
+        print("Looking for NEW server... (" .. attempt .. "/" .. maxAttempts .. ")")
 
         local response = requestFunc({
             Url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100",
@@ -245,23 +249,25 @@ local function serverHop()
 
             if ok and data and data.data then
                 for _, server in ipairs(data.data) do
+                    local sid = server.id
+
                     if server.playing >= CONFIG.MIN_PLAYERS
                     and server.playing <= CONFIG.MAX_PLAYERS
-                    and server.id ~= originalJobId
-                    and not tried[server.id]
-                    and not visitedServers[server.id] then
+                    and sid ~= originalJobId
+                    and not triedThisSession[sid]
+                    and not visitedServers[sid] then
 
-                        tried[server.id] = true
-                        print("Trying →", server.id, "| Players:", server.playing)
+                        triedThisSession[sid] = true
+                        print("Trying NEW server →", sid, "| Players:", server.playing)
 
                         pcall(function()
-                            TeleportService:TeleportToPlaceInstance(PlaceId, server.id, LocalPlayer)
+                            TeleportService:TeleportToPlaceInstance(PlaceId, sid, LocalPlayer)
                         end)
 
-                        for i = 1, 6 do
+                        for i = 1, 7 do
                             task.wait(1)
                             if game.JobId ~= originalJobId then
-                                print("Teleport successful!")
+                                print("Teleport successful! New JobId:", game.JobId)
                                 return
                             end
                         end
@@ -275,14 +281,14 @@ local function serverHop()
         task.wait(1.5)
     end
 
-    print("No good server found → forcing place rejoin")
+    print("No new servers found → forcing place rejoin")
     pcall(function()
         TeleportService:Teleport(PlaceId)
     end)
 end
 
--- Main
-print("Scanning booths...")
+-- ========== Main ==========
+print("Scanning for Inferno pets (400-800 Tokens)...")
 local results = scanBooths()
 sendWebhook(results)
 
