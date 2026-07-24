@@ -160,7 +160,7 @@ function MailBypassUI:_Build()
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
 	}, ScreenGui)
-	Create("UICorner", { CornerRadius = UDim.new(0, 10) }, Main)
+	Create("UICorner", { CornerRadius = UDim.new(0, 18) }, Main)
 	Create("UIStroke", { Color = Theme.PanelBorder, Thickness = 1 }, Main)
 	self.Main = Main
 
@@ -293,7 +293,7 @@ function MailBypassUI:_Build()
 		Size = UDim2.new(1, -12, 0, 32),
 		BackgroundColor3 = Color3.fromRGB(70, 70, 235),
 	}, Main)
-	Create("UICorner", { CornerRadius = UDim.new(0, 8) }, Banner)
+	Create("UICorner", { CornerRadius = UDim.new(0, 16) }, Banner)
 	Create("UIGradient", {
 		Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 70, 235)),
