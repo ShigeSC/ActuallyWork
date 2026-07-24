@@ -164,6 +164,11 @@ function MailBypassUI:_Build()
 	Create("UIStroke", { Color = Theme.PanelBorder, Thickness = 1 }, Main)
 	self.Main = Main
 
+	-- Forward-declared so the minimize button (wired up further down, before
+	-- these are actually built) can reference them as real upvalues instead
+	-- of erroring on nil globals.
+	local TabBar, Content, Banner
+
 	-- ============ TOP BAR ============
 	local TopBar = Create("Frame", {
 		Name = "TopBar",
@@ -222,7 +227,7 @@ function MailBypassUI:_Build()
 	self.StatsLabel = StatsLabel
 
 	local CloseBtn = Create("TextButton", {
-		Text = "✕",
+		Text = "X",
 		Font = Theme.Font,
 		TextSize = 16,
 		TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -233,9 +238,9 @@ function MailBypassUI:_Build()
 	}, TopBar)
 
 	local MinBtn = Create("TextButton", {
-		Text = "—",
+		Text = "_",
 		Font = Theme.Font,
-		TextSize = 16,
+		TextSize = 20,
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -38, 0.5, 0),
@@ -249,9 +254,26 @@ function MailBypassUI:_Build()
 	local FullSize = Main.Size
 	MinBtn.Activated:Connect(function()
 		Minimized = not Minimized
-		SafeTween(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {
-			Size = Minimized and UDim2.new(0, FullSize.X.Offset, 0, 46) or FullSize
-		})
+
+		if Minimized then
+			-- Hide everything except the top bar immediately, then shrink
+			TabBar.Visible = false
+			Content.Visible = false
+			Banner.Visible = false
+			SafeTween(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {
+				Size = UDim2.new(0, FullSize.X.Offset, 0, 46)
+			})
+		else
+			-- Restore size first, then reveal once it's back to full height
+			SafeTween(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad), { Size = FullSize })
+			task.delay(0.18, function()
+				if not Minimized then
+					TabBar.Visible = true
+					Content.Visible = true
+					Banner.Visible = true
+				end
+			end)
+		end
 	end)
 
 	CloseBtn.Activated:Connect(function()
@@ -259,7 +281,7 @@ function MailBypassUI:_Build()
 	end)
 
 	-- ============ TAB BAR ============
-	local TabBar = Create("Frame", {
+	TabBar = Create("Frame", {
 		Name = "TabBar",
 		Position = UDim2.new(0, 0, 0, 46),
 		Size = UDim2.new(1, 0, 0, 34),
@@ -276,7 +298,7 @@ function MailBypassUI:_Build()
 	Create("UIPadding", { PaddingLeft = UDim.new(0, 10) }, TabBar)
 
 	-- ============ CONTENT AREA ============
-	local Content = Create("Frame", {
+	Content = Create("Frame", {
 		Name = "Content",
 		Position = UDim2.new(0, 0, 0, 80),
 		Size = UDim2.new(1, 0, 1, -80 - 40), -- leave room for bottom banner
@@ -286,7 +308,7 @@ function MailBypassUI:_Build()
 	self.Content = Content
 
 	-- ============ BOTTOM BANNER ============
-	local Banner = Create("Frame", {
+	Banner = Create("Frame", {
 		Name = "Banner",
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.new(0.5, 0, 1, -6),
