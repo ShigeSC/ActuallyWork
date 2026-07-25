@@ -289,34 +289,28 @@ local function OpenClose()
 		BorderColor3 = Color3.fromRGB(0, 0, 0),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0.1021, 0, 0.0743, 0),
-		Size = UDim2.new(0, 50, 0, 50),
+		Position = UDim2.new(0.1, 0, 0.07, 0),
+		Size = UDim2.new(0, 60, 0, 60),
 		Image = "rbxassetid://90541504618217",
 		Visible = true,
+		Active = true,
 	}, ScreenGui)
 
 	Custom:Create("UICorner", {
 		Name = "MainCorner",
-		CornerRadius = UDim.new(0, 12),
+		CornerRadius = UDim.new(0, 14),
 	}, Close_ImageButton)
 
-	local dragging, dragStart, startPos = false, nil, nil
-
-	local function UpdateDraggable(input)
-		local delta = input.Position - dragStart
-		if delta.Magnitude > 6 then
-			Close_ImageButton:SetAttribute("WisDragged", true)
-		end
-		Close_ImageButton.Position =
-			UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
+	local dragging = false
+	local dragStart = nil
+	local startPos = nil
+	local hasDragged = false
 
 	Close_ImageButton.InputBegan:Connect(function(input)
-		if
-			input.UserInputType == Enum.UserInputType.Touch
-			or input.UserInputType == Enum.UserInputType.MouseButton1
-		then
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
+			hasDragged = false
 			dragStart = input.Position
 			startPos = Close_ImageButton.Position
 			Close_ImageButton:SetAttribute("WisDragged", false)
@@ -324,20 +318,37 @@ local function OpenClose()
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
 					dragging = false
+					Close_ImageButton:SetAttribute("WisDragged", hasDragged)
 				end
 			end)
 		end
 	end)
 
-	Close_ImageButton.InputChanged:Connect(function(input)
-		if
-			dragging
-			and (
-				input.UserInputType == Enum.UserInputType.MouseMovement
-				or input.UserInputType == Enum.UserInputType.Touch
-			)
-		then
-			UpdateDraggable(input)
+	UserInputService.InputChanged:Connect(function(input)
+		if not dragging then return end
+		if input.UserInputType ~= Enum.UserInputType.MouseMovement
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+			return
+		end
+
+		local delta = input.Position - dragStart
+		if delta.Magnitude > 4 then
+			hasDragged = true
+			Close_ImageButton:SetAttribute("WisDragged", true)
+		end
+
+		Close_ImageButton.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
 		end
 	end)
 
