@@ -849,7 +849,7 @@ function ScoopHub_Library:CreateWindow(Config)
 		BackgroundTransparency = 0.08,
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
-		Position = UDim2.new(0, 145, 0.5, 0),
+		Position = UDim2.new(0, 145, 0.5, 0), -- 145 ung new place nya pero pwede edit yan later ang slow kasi ng update
 		Size = UDim2.new(0, 150, 0, 22),
 		Name = "DiscordPill",
 	}, Top)
