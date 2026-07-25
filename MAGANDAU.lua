@@ -935,7 +935,7 @@ function WisHub_Library:CreateWindow(Config)
 			end
 		end)
 		WisHub_Library:SetNotification({
-			Title = "WisHUB",
+			Title = "ScoopHub",
 			Description = "Discord",
 			Content = "Copied to clipboard: " .. DiscordInvite,
 		})
