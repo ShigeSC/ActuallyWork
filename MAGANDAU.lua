@@ -284,59 +284,37 @@ local function OpenClose()
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, GetGuiParent())
 
-	-- Bigger invisible hitbox so it's easy to grab
--- Bigger invisible hitbox so it's easy to grab
-	-- Bigger invisible hitbox so it's easy to grab
-	local DragFrame = Custom:Create("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Position = UDim2.new(0.1, 0, 0.07, 0),
-		Size = UDim2.new(0, 56, 0, 56), -- tiny extra grab only
-		Active = true,
-	}, ScreenGui)
-	
 	local Close_ImageButton = Custom:Create("ImageButton", {
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+		BorderColor3 = Color3.fromRGB(0, 0, 0),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 50, 0, 50), -- same as original
+		Position = UDim2.new(0.1021, 0, 0.0743, 0),
+		Size = UDim2.new(0, 50, 0, 50), -- original size
 		Image = "rbxassetid://90541504618217",
 		Visible = true,
 		Active = true,
-	}, DragFrame)
+	}, ScreenGui)
 
 	Custom:Create("UICorner", {
 		Name = "MainCorner",
-		CornerRadius = UDim.new(0, 14),
+		CornerRadius = UDim.new(0, 12),
 	}, Close_ImageButton)
 
-	-- Same style drag as the big GUI (smooth + easy)
+	-- Better drag (same method as big GUI)
 	local dragging = false
 	local dragStart = Vector2.new()
 	local startPos = UDim2.new()
 	local hasDragged = false
 
-	local function beginDrag(input)
-		dragging = true
-		hasDragged = false
-		dragStart = UserInputService:GetMouseLocation()
-		startPos = DragFrame.Position
-		DragFrame:SetAttribute("WisDragged", false)
-	end
-
-	DragFrame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1
-		or input.UserInputType == Enum.UserInputType.Touch then
-			beginDrag(input)
-		end
-	end)
-
 	Close_ImageButton.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1
 		or input.UserInputType == Enum.UserInputType.Touch then
-			beginDrag(input)
+			dragging = true
+			hasDragged = false
+			dragStart = UserInputService:GetMouseLocation()
+			startPos = Close_ImageButton.Position
+			Close_ImageButton:SetAttribute("WisDragged", false)
 		end
 	end)
 
@@ -345,7 +323,6 @@ local function OpenClose()
 		or input.UserInputType == Enum.UserInputType.Touch then
 			if dragging then
 				dragging = false
-				DragFrame:SetAttribute("WisDragged", hasDragged)
 				Close_ImageButton:SetAttribute("WisDragged", hasDragged)
 			end
 		end
@@ -359,11 +336,10 @@ local function OpenClose()
 
 		if delta.Magnitude > 5 then
 			hasDragged = true
-			DragFrame:SetAttribute("WisDragged", true)
 			Close_ImageButton:SetAttribute("WisDragged", true)
 		end
 
-		DragFrame.Position = UDim2.new(
+		Close_ImageButton.Position = UDim2.new(
 			startPos.X.Scale,
 			startPos.X.Offset + delta.X,
 			startPos.Y.Scale,
@@ -371,8 +347,6 @@ local function OpenClose()
 		)
 	end)
 
-	-- keep compatibility with code that uses Open_Close as the button
-	Close_ImageButton.Parent = DragFrame
 	return Close_ImageButton
 end
 
