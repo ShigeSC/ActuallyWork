@@ -1699,7 +1699,7 @@ function WisHub_Library:CreateWindow(Config)
 		TabState.ChooseFrame.Size = IsActive and UDim2.new(0, 2, 0, 14) or UDim2.new(0, 0, 0, 0)
 
 		SafeTween(TabState.Tab, Tween, {
-			BackgroundColor3 = IsActive and Color3.fromRGB(48, 24, 70) or Color3.fromRGB(255, 255, 255),
+			BackgroundColor3 = IsActive and Color3.fromRGB(60, 15, 15) or Color3.fromRGB(255, 255, 255),
 			BackgroundTransparency = IsActive and 0.12 or 0.999,
 		})
 
@@ -3410,7 +3410,7 @@ function WisHub_Library:CreateWindow(Config)
 									Option,
 									TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
 									{
-										BackgroundColor3 = Selected and Color3.fromRGB(48, 24, 70) or Custom.Surface3,
+										BackgroundColor3 = Selected and Color3.fromRGB(60, 15, 15) or Custom.Surface3,
 										BackgroundTransparency = Selected and 0.08 or 0.999,
 									}
 								)
@@ -3449,7 +3449,7 @@ function WisHub_Library:CreateWindow(Config)
 							local Selected = table.find(Funcs_Dropdown.Value, OptionName) ~= nil
 
 							local Option = Custom:Create("Frame", {
-								BackgroundColor3 = Selected and Color3.fromRGB(48, 24, 70) or Custom.Surface3,
+								BackgroundColor3 = Selected and Color3.fromRGB(60, 15, 15) or Custom.Surface3,
 								BackgroundTransparency = Selected and 0.08 or 0.999,
 								BorderColor3 = Color3.fromRGB(0, 0, 0),
 								BorderSizePixel = 0,
