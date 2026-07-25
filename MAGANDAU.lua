@@ -290,7 +290,7 @@ local function OpenClose()
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		Position = UDim2.new(0.1021, 0, 0.0743, 0),
-		Size = UDim2.new(0, 50, 0, 50), -- original size
+		Size = UDim2.new(0, 70, 0, 70), -- original size
 		Image = "rbxassetid://90541504618217",
 		Visible = true,
 		Active = true,
