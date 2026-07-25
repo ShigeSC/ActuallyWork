@@ -1850,7 +1850,7 @@ function ScoopHub_Library:CreateWindow(Config)
 
 		local ScrolLayers = Custom:Create("ScrollingFrame", {
 			ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80),
-			ScrollBarThickness = 0.5,
+			ScrollBarThickness = 0,
 			Active = true,
 			ClipsDescendants = true,
 			ScrollingEnabled = false,
