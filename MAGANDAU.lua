@@ -301,7 +301,7 @@ local function OpenClose()
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 30, 0, 30), -- same as original
+		Size = UDim2.new(0, 45, 0, 45), -- same as original
 		Image = "rbxassetid://90541504618217",
 		Visible = true,
 		Active = true,
