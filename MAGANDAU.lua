@@ -285,21 +285,23 @@ local function OpenClose()
 	}, GetGuiParent())
 
 	-- Bigger invisible hitbox so it's easy to grab
+-- Bigger invisible hitbox so it's easy to grab
+	-- Bigger invisible hitbox so it's easy to grab
 	local DragFrame = Custom:Create("Frame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Position = UDim2.new(0.1, 0, 0.07, 0),
-		Size = UDim2.new(0, 80, 0, 80), -- large grab area
+		Size = UDim2.new(0, 65, 0, 65), -- not too big
 		Active = true,
 	}, ScreenGui)
-
+	
 	local Close_ImageButton = Custom:Create("ImageButton", {
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 60, 0, 60),
+		Size = UDim2.new(0, 55, 0, 55), -- only slightly bigger than old 50
 		Image = "rbxassetid://90541504618217",
 		Visible = true,
 		Active = true,
