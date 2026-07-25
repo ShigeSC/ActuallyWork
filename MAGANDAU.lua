@@ -291,7 +291,7 @@ local function OpenClose()
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Position = UDim2.new(0.1, 0, 0.07, 0),
-		Size = UDim2.new(0, 50, 0 ,50), -- not too big
+		Size = UDim2.new(0, 40, 0 ,40), -- not too big
 		Active = true,
 	}, ScreenGui)
 	
@@ -301,7 +301,7 @@ local function OpenClose()
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 40, 0 ,40), -- only slightly bigger than old 50
+		Size = UDim2.new(0, 30, 0 ,30), -- only slightly bigger than old 50
 		Image = "rbxassetid://90541504618217",
 		Visible = true,
 		Active = true,
