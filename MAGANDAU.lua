@@ -733,7 +733,7 @@ function WisHub_Library:CreateWindow(Config)
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(580, 380)
 	local DiscordInvite = Config.Discord or Config[5] or "discord.gg/wishubx"
 	local DiscordLogo = Config.DiscordIcon or Config[6] or "rbxassetid://94434236999817"
-	local HubLogo = Config.Logo or Config.TitleLogo or "rbxassetid://105006444774299"
+	local HubLogo = Config.Logo or Config.TitleLogo or "rbxassetid://90541504618217"
 	local HubLogoSize = Config.LogoSize or 24
 	local HubLogoColor = Config.LogoColor or Color3.fromRGB(255, 255, 255)
 
