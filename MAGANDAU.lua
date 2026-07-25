@@ -280,7 +280,7 @@ end
 
 local function OpenClose()
 	local ScreenGui = Custom:Create("ScreenGui", {
-		Name = "WisHUBRuntime",
+		Name = "ScoopHubRuntime",
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, GetGuiParent())
 
@@ -494,13 +494,13 @@ local DefaultTabIcons = {
 	config = "settings",
 }
 
-local WisHub_Library = {}
+local ScoopHub_Library = {}
 
-WisHub_Library.Icons = Icons
-WisHub_Library.DefaultTabIcons = DefaultTabIcons
-WisHub_Library.Unloaded = false
+ScoopHub_Library.Icons = Icons
+ScoopHub_Library.DefaultTabIcons = DefaultTabIcons
+ScoopHub_Library.Unloaded = false
 
-function WisHub_Library:SetNotification(Config)
+function ScoopHub_Library:SetNotification(Config)
 	local Title = Config[1] or Config.Title or ""
 	local Description = Config[2] or Config.Description or ""
 	local Content = Config[3] or Config.Content or ""
@@ -726,12 +726,12 @@ function WisHub_Library:SetNotification(Config)
 	return NotifFuncs
 end
 
-function WisHub_Library:CreateWindow(Config)
+function ScoopHub_Library:CreateWindow(Config)
 	local Title = Config[1] or Config.Title or ""
 	local Description = Config[2] or Config.Description or ""
 	local TabWidth = Config[3] or Config["Tab Width"] or 120
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(580, 380)
-	local DiscordInvite = Config.Discord or Config[5] or "discord.gg/wishubx"
+	local DiscordInvite = Config.Discord or Config[5] or "discord.gg/WxgqUa9Qz"
 	local DiscordLogo = Config.DiscordIcon or Config[6] or "rbxassetid://94434236999817"
 	local HubLogo = Config.Logo or Config.TitleLogo or "rbxassetid://90541504618217"
 	local HubLogoSize = Config.LogoSize or 24
@@ -739,7 +739,7 @@ function WisHub_Library:CreateWindow(Config)
 
 	local Funcs = {}
 
-	local WisHubGui = Custom:Create("ScreenGui", {
+	local ScoopHubGui = Custom:Create("ScreenGui", {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, GetGuiParent())
 
@@ -751,7 +751,7 @@ function WisHub_Library:CreateWindow(Config)
 		ZIndex = 0,
 		Name = "DropShadowHolder",
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-	}, WisHubGui)
+	}, ScoopHubGui)
 
 	local DropShadow = Custom:Create("ImageLabel", {
 		Image = "rbxassetid://6015897843",
@@ -934,7 +934,7 @@ function WisHub_Library:CreateWindow(Config)
 				setclipboard(DiscordInvite)
 			end
 		end)
-		WisHub_Library:SetNotification({
+		ScoopHub_Library:SetNotification({
 			Title = "ScoopHub",
 			Description = "Discord",
 			Content = "Copied to clipboard: " .. DiscordInvite,
@@ -1405,7 +1405,7 @@ function WisHub_Library:CreateWindow(Config)
 
 	Custom:Create("TextLabel", {
 		Font = Custom.Font,
-		Text = "Close WisHUB?",
+		Text = "Close ScoopHub?",
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextSize = 16,
 		BackgroundTransparency = 1,
@@ -1489,11 +1489,11 @@ function WisHub_Library:CreateWindow(Config)
 		if Open_Close then
 			Open_Close.Visible = false
 		end
-		if WisHubGui then
-			WisHubGui:Destroy()
+		if ScoopHubGui then
+			ScoopHubGui:Destroy()
 		end
-		if not WisHub_Library.Unloaded then
-			WisHub_Library.Unloaded = true
+		if not ScoopHub_Library.Unloaded then
+			ScoopHub_Library.Unloaded = true
 		end
 	end)
 
@@ -1611,7 +1611,7 @@ function WisHub_Library:CreateWindow(Config)
 		return string.lower(Text)
 	end
 
-	local PreferredTab = Config.DefaultTab or Config.DefaultTabName or WisHub_Library.LastSelectedTab or "Info"
+	local PreferredTab = Config.DefaultTab or Config.DefaultTabName or ScoopHub_Library.LastSelectedTab or "Info"
 	local PreferredTabKey = NormalizeTabName(PreferredTab)
 
 	local function ResolveTabState(TabName)
@@ -1721,7 +1721,7 @@ function WisHub_Library:CreateWindow(Config)
 
 		CurrentTab = TabState.Name
 		Tabs.CurrentTab = CurrentTab
-		WisHub_Library.LastSelectedTab = CurrentTab
+		ScoopHub_Library.LastSelectedTab = CurrentTab
 		NameTab.Text = CurrentTab
 		CloseFloatingState()
 
@@ -4026,4 +4026,4 @@ function WisHub_Library:CreateWindow(Config)
 	return Tabs
 end
 
-return WisHub_Library
+return ScoopHub_Library
