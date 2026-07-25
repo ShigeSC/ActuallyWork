@@ -347,17 +347,9 @@ end
 local Open_Close = OpenClose()
 
 local function MakeDraggable(topbarobject, object)
-	local dragging, dragStart, startPos = false, nil, nil
-
-	local function UpdatePos(input)
-		if not dragging or not dragStart or not startPos then
-			return
-		end
-		local delta = input.Position - dragStart
-		local newPos =
-			UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		object.Position = newPos
-	end
+	local dragging = false
+	local dragStart = Vector2.new()
+	local startPos = UDim2.new()
 
 	topbarobject.InputBegan:Connect(function(input)
 		if
@@ -367,29 +359,8 @@ local function MakeDraggable(topbarobject, object)
 			dragging = true
 			dragStart = UserInputService:GetMouseLocation()
 			startPos = object.Position
-
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-					dragInput = nil
-				end
-			end)
 		end
 	end)
-
-		RunService.RenderStepped:Connect(function()
-			if not dragging then
-				return
-			end
-	
-			local mouse = UserInputService:GetMouseLocation()
-			local delta = mouse - dragStart
-	
-			object.Position = UDim2.new(
-				startPos.X.Scale, startPos.X.Offset + delta.X,
-				startPos.Y.Scale, startPos.Y.Offset + delta.Y
-			)
-		end)
 
 	UserInputService.InputEnded:Connect(function(input)
 		if
@@ -397,8 +368,21 @@ local function MakeDraggable(topbarobject, object)
 			or input.UserInputType == Enum.UserInputType.Touch
 		then
 			dragging = false
-			dragInput = nil
 		end
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		if not dragging then
+			return
+		end
+
+		local mouse = UserInputService:GetMouseLocation()
+		local delta = mouse - dragStart
+
+		object.Position = UDim2.new(
+			startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y
+		)
 	end)
 end
 
