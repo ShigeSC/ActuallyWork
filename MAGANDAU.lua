@@ -825,17 +825,17 @@ function ScoopHub_Library:CreateWindow(Config)
 
 	local TextLabel1 = Custom:Create("TextLabel", {
 		Font = Custom.Font,
-		Text = "",
-		TextColor3 = Color3.fromRGB(235, 235, 240),
+		Text = Config.HubName or Config.Title,
+		TextColor3 = Config.HubNameColor or Color3.fromRGB(255, 60, 60),
 		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-		BackgroundTransparency = 0.9990000128746033,
-		BorderColor3 = Color3.fromRGB(0, 0, 0),
+		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Size = UDim2.new(0, 0, 1, 0),
-		Position = UDim2.new(0, 0, 0, 0),
-		Visible = false,
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 40, 0.5, 0),
+		Size = UDim2.new(0, 100, 0, 20),
+		Visible = true,
+		Name = "HubTitle",
 	}, Top)
 
 	Custom:Create("UIStroke", {
@@ -849,7 +849,7 @@ function ScoopHub_Library:CreateWindow(Config)
 		BackgroundTransparency = 0.08,
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
-		Position = UDim2.new(0, 42, 0.5, 0),
+		Position = UDim2.new(0, 145, 0.5, 0),
 		Size = UDim2.new(0, 150, 0, 22),
 		Name = "DiscordPill",
 	}, Top)
